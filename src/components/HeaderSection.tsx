@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { getCategories, getProducts } from "@/lib/api";
 import { bn } from "@/lib/bn";
-import { changeDir } from "@/components/ProductCard";
+import { changeDir, unitLabel } from "@/components/ProductCard";
 import BanglaDate from "@/components/BanglaDate";
 import CategoryNav from "@/components/CategoryNav";
 import AuthButtons from "@/components/AuthButtons";
@@ -86,8 +86,7 @@ export default async function HeaderSection() {
                       </span>
 
                       <span className="text-gray-500">
-                        {bn(product.today)} টাকা/
-                        {product.unit === "kg" ? "কেজি" : product.unit}
+                        {bn(product.today)} টাকা/{unitLabel(product.unit)}
                       </span>
 
                       <b className={colorClass}>
