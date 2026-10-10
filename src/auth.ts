@@ -3,13 +3,19 @@ import { memoryAdapter } from "better-auth/adapters/memory";
 import type { BetterAuthOptions } from "better-auth";
 import type { MemoryDB } from "better-auth/adapters/memory";
 
-const memoryDb: MemoryDB = {
+const globalForAuth = globalThis as unknown as {
+  __bazarDorMemoryDb?: MemoryDB;
+};
+
+const memoryDb: MemoryDB = globalForAuth.__bazarDorMemoryDb ?? {
   user: [],
   session: [],
   account: [],
   verification: [],
   authenticator: [],
 };
+
+globalForAuth.__bazarDorMemoryDb = memoryDb;
 
 const socialProviders: BetterAuthOptions["socialProviders"] = {};
 
