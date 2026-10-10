@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import HeroDate from "@/components/HeroDate";
+import BanglaDate from "@/components/BanglaDate";
 
 export default function HeroSection() {
   return (
@@ -8,7 +8,7 @@ export default function HeroSection() {
         <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e5f4e9] px-3 py-1 text-[11px] font-medium text-green-800 sm:text-xs">
           <span>📅</span>
           <Suspense fallback={<>…</>}>
-            <HeroDate />
+            <BanglaDate />
           </Suspense>
         </span>
 

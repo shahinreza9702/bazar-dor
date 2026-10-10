@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { getCategories, getProducts } from "@/lib/api";
-import { bn, bnDate } from "@/lib/bn";
+import { bn } from "@/lib/bn";
 import { changeDir } from "@/components/ProductCard";
+import BanglaDate from "@/components/BanglaDate";
 import CategoryNav from "@/components/CategoryNav";
 import AuthButtons from "@/components/AuthButtons";
 
@@ -34,7 +36,9 @@ export default async function HeaderSection() {
               বাজার দর
             </span>
             <span className="block text-[10px] text-gray-500 sm:text-[11px]">
-              {bnDate()}
+              <Suspense fallback={<>…</>}>
+                <BanglaDate />
+              </Suspense>
             </span>
           </span>
         </Link>
