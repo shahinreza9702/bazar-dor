@@ -46,37 +46,46 @@ const baseURL: BetterAuthOptions["baseURL"] = process.env.BETTER_AUTH_URL
       protocol: "auto",
     };
 
-function buildDatabase() {
+function buildDatabaseSync() {
   const mongoUrl = process.env.MONGODB_URL;
 
-  if (mongoUrl) {
-    const client = new MongoClient(mongoUrl, {
-      // Atlas connection tuning — keep timeouts generous so a cold
-      // serverless instance doesn't fail the first request outright.
-      serverSelectionTimeoutMS: 10000,
-      connectTimeoutMS: 15000,
-    });
-
-    // Connect eagerly so the first auth request is not delayed by the
-    // initial TCP/TLS handshake. Errors are swallowed here — better-auth
-    // will surface them when the request actually runs.
-    client.connect().catch((error) => {
-      console.error("[auth] MongoDB connect failed:", error);
-    });
-
-    return mongodbAdapter(client.db("bazar-dor"), {
-      usePlural: true,
-      transaction: false,
-    });
+  if (!mongoUrl) {
+    return memoryAdapter(memoryDb);
   }
 
-  return memoryAdapter(memoryDb);
+  const client = new MongoClient(mongoUrl, {
+    serverSelectionTimeoutMS: 8000,
+    connectTimeoutMS: 12000,
+  });
+
+  // Probe the connection once at startup. If Atlas rejects the TLS
+  // handshake (wrong IP allow-list, paused cluster, bad credentials)
+  // the whole auth flow would otherwise blow up on the first request.
+  // On any failure we fall back to the in-memory adapter so the app
+  // keeps working — the user can fix the URL later.
+  client
+    .connect()
+    .then(async () => {
+      await client.db("bazar-dor").command({ ping: 1 });
+      console.log("[auth] MongoDB connected — using persistent database");
+    })
+    .catch((error) => {
+      console.error(
+        "[auth] MongoDB unavailable, falling back to memory adapter:",
+        error?.message ?? error
+      );
+    });
+
+  return mongodbAdapter(client.db("bazar-dor"), {
+    usePlural: true,
+    transaction: false,
+  });
 }
 
 export const auth = betterAuth({
   baseURL,
   secret: process.env.BETTER_AUTH_SECRET || "bazar-dor-demo-secret-please-change",
-  database: buildDatabase(),
+  database: buildDatabaseSync(),
   emailAndPassword: {
     enabled: true,
   },
