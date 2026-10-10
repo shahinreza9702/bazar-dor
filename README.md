@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# বাজার দর (BazarDor)
 
-## Getting Started
+আজকের বাজারের দাম এক নজরে — চাল, ডাল, তেল, সবজি, মাছ, মাংস, ডিম ও নিত্যপণ্যের
+দাম এবং দামের পরিবর্তন (▲/▼) বাংলায় দেখার জন্য তৈরি একটি ওয়েব অ্যাপ।
 
-First, run the development server:
+প্রতিদিনের প্রয়োজনীয় পণ্যের দাম বিভিন্ন বাজার অনুযায়ী দেখুন, দাম বেড়েছে
+বা কমেছে তা এক চোখে বুঝুন, এবং প্রতিটি পণ্যের বাজারভিত্তিক সর্বনিম্ন,
+সর্বোচ্চ ও গড় দাম দেখুন।
+
+## ✨ বৈশিষ্ট্য (Features)
+
+1. **লাইভ প্রাইস টিকার** — নেভবারের নিচে অসীম স্ক্রলিং মার্কি (marquee) যেখানে
+   প্রতিটি পণ্যের ইমোজি, নাম, দাম (টাকা/একক) এবং ▲/▼ শতাংশ পরিবর্তন দেখা যায়।
+2. **আজ দাম বেড়েছে / কমেছে** — আজকের সর্বোচ্চ ৬টি দামবৃদ্ধি ও দামহ্রাস পণ্যের
+   আলাদা সেকশন, সব পণ্যের রেসপন্সিভ গ্রিড (মোবাইল-ট্যাবলেট-ডেস্কটপ)।
+3. **পণ্যের বিস্তারিত পৃষ্ঠা** — লগইন সুরক্ষিত রুট; প্রতি পণ্যের সর্বনিম্ন,
+   সর্বোচ্চ ও গড় দাম এবং বাজারভিত্তিক আজকের দামের টেবিল।
+4. **ক্যাটাগরি পেজ ও সাজান** — ক্যাটাগরি অনুযায়ী পণ্য তালিকা, ডিফল্ট /
+   দাম: কম থেকে বেশি / দাম: বেশি থেকে কম সাজানো (সংখ্যানুযায়ী সাজানো)।
+5. **BetterAuth দিয়ে প্রমাণীকরণ** — ইমেইল/পাসওয়ার্ড লগইন-রেজিস্টার,
+   Google/GitHub সোশ্যাল লগইন, প্রোফাইল ও তথ্য হালনাগাদ, টোস্ট নোটিফিকেশন।
+6. **রেসপন্সিভ ডিজাইন ও ৪০৪ পেজ** — সব স্ক্রিনে কাজ করে, অজানা রুটে
+   বন্ধুসুলভ ৪০৪ পেজ, ডেটা লোডিং-এ স্কেলটন লোডার।
+
+## 🛠️ প্রযুক্তি (Technologies)
+
+| প্রযুক্তি | ব্যবহার |
+| --- | --- |
+| Next.js 16 (App Router) | পেজ ও রাউটিং, Partial Prerendering |
+| React 19 | ইউআই কম্পোনেন্ট |
+| TypeScript | টাইপ সেফটি |
+| Tailwind CSS | স্টাইলিং ও রেসপন্সিভনেস |
+| BetterAuth (memory adapter) | প্রমাণীকরণ (ইমেইল/পাসওয়ার্ড + Google + GitHub) |
+| react-hot-toast | টোস্ট নোটিফিকেশন |
+| Vercel | ডিপ্লয়মেন্ট |
+
+## 🚀 চালানো (Run locally)
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+অ্যাপটি খুলুন: http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### পরিবেশ চলক (Environment variables)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+সব চলক ঐচ্ছিক — না থাকলে অ্যাপ ডেমো মোডে চলে (ইন-মেমরি ডেটাবেস)।
 
-## Learn More
+| চলক | বর্ণনা |
+| --- | --- |
+| `BETTER_AUTH_URL` | অ্যাপের পাবলিক URL (যেমন `https://your-app.vercel.app`) |
+| `BETTER_AUTH_SECRET` | BetterAuth সিক্রেট (প্রোডাকশনে নিজের সিক্রেট দিন) |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth (সোশ্যাল লগইন) |
+| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | GitHub OAuth (সোশ্যাল লগইন) |
 
-To learn more about Next.js, take a look at the following resources:
+## 📂 প্রোজেক্ট গঠন
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/
+│   ├── (page.tsx)            # হোম পেজ (হিরো, বেড়েছে/কমেছে, সব পণ্য)
+│   ├── category/[slug]/      # ক্যাটাগরি পেজ + সাজান
+│   ├── product/[slug]/       # পণ্যের বিস্তারিত (লগইন প্রয়োজন)
+│   ├── profile/              # আমার প্রোফাইল
+│   ├── profile/update/       # তথ্য হালনাগাদ
+│   ├── signin/ signup/       # প্রমাণীকরণ
+│   ├── api/auth/[...all]/    # BetterAuth API হ্যান্ডলার
+│   ├── not-found.tsx         # ৪০৪ পেজ
+│   └── loading.tsx           # স্কেলটন লোডিং
+├── components/               # নেভ, ফুটার, প্রোডাক্ট কার্ড, ফর্ম
+├── lib/                      # API ফেচার, বাংলা সংখ্যা ইউটিল, auth ক্লায়েন্ট
+└── auth.ts                   # BetterAuth কনফিগারেশন
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📝 নোট
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- ডেমো মোডে ব্যবহারকারী ডেটা সার্ভার প্রসেসের মেমোরিতে থাকে; সার্ভার
+  রিস্টার্ট হলে অ্যাকাউন্ট মুছে যায। প্রোডাকশনে স্থায়ী ডেটাবেস
+  (যেমন Turso/LibSQL) যোগ করতে `src/auth.ts` এর অ্যাডাপ্টার বদলান।
+- পণ্যের ডেটা আসে `https://api.api-store.workers.dev/api/bazardor` এপিআই থেকে।
