@@ -33,12 +33,26 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
   };
 }
 
+// When BETTER_AUTH_URL is set it wins (single known origin). Otherwise use
+// better-auth's dynamic base URL config so the API accepts requests from any
+// Vercel deployment (including preview URLs) and from localhost without env vars.
+const baseURL: BetterAuthOptions["baseURL"] = process.env.BETTER_AUTH_URL
+  ? process.env.BETTER_AUTH_URL
+  : {
+      allowedHosts: ["localhost", "127.0.0.1", "*.vercel.app"],
+      fallback: "http://localhost:3000",
+      protocol: "auto",
+    };
+
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+  baseURL,
   secret: process.env.BETTER_AUTH_SECRET || "bazar-dor-demo-secret-please-change",
   database: memoryAdapter(memoryDb),
   emailAndPassword: {
     enabled: true,
   },
   socialProviders,
+  advanced: {
+    trustedProxyHeaders: true,
+  },
 });
