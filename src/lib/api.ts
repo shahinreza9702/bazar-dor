@@ -32,7 +32,8 @@ export type Product = {
   markets: Market[];
 };
 
-const API_BASE = "https://api.api-store.workers.dev/api/bazardor";
+const API_BASE = "https://api.abcz.workers.dev/api/bazardor";
+
 
 async function getJson<T>(path: string): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, { cache: "no-store" });
