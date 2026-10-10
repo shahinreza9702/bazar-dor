@@ -1,4 +1,4 @@
-import { betterAuth } from "better-auth";
+import { betterAuth, string } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { memoryAdapter } from "better-auth/adapters/memory";
 import { MongoClient } from "mongodb";
@@ -41,10 +41,10 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
 const baseURL: BetterAuthOptions["baseURL"] = process.env.BETTER_AUTH_URL
   ? process.env.BETTER_AUTH_URL
   : {
-      allowedHosts: ["localhost", "127.0.0.1", "*.vercel.app"],
-      fallback: "http://localhost:3000",
-      protocol: "auto",
-    };
+    allowedHosts: ["localhost", "127.0.0.1", "*.vercel.app"],
+    fallback: "http://localhost:3000",
+    protocol: "auto",
+  };
 
 /**
  * Pick the database adapter at module load time.
@@ -77,13 +77,15 @@ async function buildDatabase() {
       usePlural: true,
       transaction: false,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(
       "[auth] MongoDB unavailable, falling back to memory adapter:",
-      error?.message ?? error
+      error instanceof Error ? error.message : error
     );
+
     // Close the half-open client so it can't linger.
-    await client.close().catch(() => {});
+    await client.close().catch(() => { });
+
     return memoryAdapter(memoryDb);
   }
 }
