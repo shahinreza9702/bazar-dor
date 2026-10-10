@@ -1,8 +1,10 @@
-import { connection } from "next/server";
+"use client";
+
+import { useMemo } from "react";
 import { bnDate } from "@/lib/bn";
 
-export default async function BanglaDate() {
-  await connection();
+export default function BanglaDate() {
+  const date = useMemo(() => bnDate(), []);
 
-  return <>{bnDate()}</>;
+  return <>{date}</>;
 }

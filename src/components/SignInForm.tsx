@@ -57,7 +57,10 @@ export default function SignInForm({
       }
 
       toast.success("সাইন ইন সফল হয়েছে");
-      router.push(callbackUrl || "/");
+      const safeCallbackUrl = callbackUrl?.startsWith("/")
+        ? callbackUrl
+        : "/";
+      router.push(safeCallbackUrl);
       router.refresh();
     } catch {
       toast.error("সাইন ইন করতে সমস্যা হয়েছে");

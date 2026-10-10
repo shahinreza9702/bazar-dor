@@ -32,7 +32,7 @@
 | React 19 | ইউআই কম্পোনেন্ট |
 | TypeScript | টাইপ সেফটি |
 | Tailwind CSS | স্টাইলিং ও রেসপন্সিভনেস |
-| BetterAuth (memory adapter) | প্রমাণীকরণ (ইমেইল/পাসওয়ার্ড + Google + GitHub) |
+| BetterAuth (MongoDB adapter) | প্রমাণীকরণ (ইমেইল/পাসওয়ার্ড + Google + GitHub) |
 | react-hot-toast | টোস্ট নোটিফিকেশন |
 | Vercel | ডিপ্লয়মেন্ট |
 
@@ -47,16 +47,17 @@ npm run dev
 
 ### পরিবেশ চলক (Environment variables)
 
-সব চলক ঐচ্ছিক — না থাকলে অ্যাপ ডেমো মোডে চলে (ইন-মেমরি ডেটাবেস)।
+`MONGODB_URL` বাধ্যতামূলক — এটি না থাকলে অ্যাপ বিল্ড/স্টার্ট হয় না (বাকি চলক ঐচ্ছিক)।
 
 | চলক | বর্ণনা |
 | --- | --- |
-| `BETTER_AUTH_URL` | অ্যাপের পাবলিক URL (যেমন `https://your-app.vercel.app`)। না থাকলে ভের্সেল/লোকাল হোস্ট অটো চেনা যায় |
+| `MONGODB_URL` | Atlas MongoDB সংযোগ স্ট্রিং (`mongodb+srv://...`)। বাধ্যতামূলক — ব্যবহারকারী ও সেশন এখানেই সংরক্ষিত হয় |
+| `BETTER_AUTH_URL` | অ্যাপের পাবলিক URL (যেমন `https://your-app.vercel.app`)। না থাকলে ভার্সেল/লোকাল হোস্ট অটো চেনা যায় |
 | `BETTER_AUTH_SECRET` | BetterAuth সিক্রেট (প্রোডাকশনে নিজের সিক্রেট দিন) |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth (সোশ্যাল লগইন) |
 | `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | GitHub OAuth (সোশ্যাল লগইন) |
 
-রেজিস্টার/লগইন ভের্সেলে কাজ করার জন্য কোনো পরিবেশ চলক দরকার হয় না —
+রেজিস্টার/লগইন ভার্সেলে কাজ করার জন্য `MONGODB_URL` দরকার।
 `src/auth.ts` এ better-auth এর ডাইনামিক `baseURL` কনফিগ আছে, যা
 `*.vercel.app` (প্রিভিউ ডিপ্লয়মেন্ট সহ) এবং `localhost` উভয়ই
 ALLOWED হিসেবে নেয়। অন্য ডোমেইনে ডিপ্লয় করতে চাইলে `allowedHosts`
@@ -83,9 +84,4 @@ src/
 
 ## 📝 নোট
 
-- ডেমো মোডে ব্যবহারকারী ডেটা সার্ভার প্রসেসের মেমোরিতে থাকে; সার্ভার
-  রিস্টার্ট হলে অ্যাকাউন্ট মুছে যায়। ভের্সেলের সার্ভারলেস ফাংশনে
-  প্রতি ইনস্ট্যান্সের আলাদা মেমোরি থাকে, তাই ইনস্ট্যান্স বদলালে
-  লগইন আবার করতে হতে পারে। প্রোডাকশনে স্থায়ী ডেটাবেস (যেমন
-  Turso/LibSQL) যোগ করতে `src/auth.ts` এর অ্যাডাপ্টার বদলান।
-- পণ্যের ডেটা আসে `https://api.api-store.workers.dev/api/bazardor` এপিআই থেকে।
+- পণ্যের ডেটা আসে `https://api.abcz.workers.dev/api/bazardor` এপিআই থেকে।
