@@ -46,10 +46,21 @@ const baseURL: BetterAuthOptions["baseURL"] = process.env.BETTER_AUTH_URL
       protocol: "auto",
     };
 
-function buildDatabaseSync() {
+/**
+ * Pick the database adapter at module load time.
+ *
+ * We probe MongoDB synchronously (top-level await) so that by the time
+ * `betterAuth(...)` is constructed we KNOW whether the topology is alive.
+ * If Atlas rejects the TLS handshake (paused cluster, IP not allow-listed,
+ * bad credentials) we fall back to the in-memory adapter instead of handing
+ * better-auth a client whose topology is closed — otherwise every
+ * sign-up/sign-in throws `MongoTopologyClosedError`.
+ */
+async function buildDatabase() {
   const mongoUrl = process.env.MONGODB_URL;
 
   if (!mongoUrl) {
+    console.log("[auth] No MONGODB_URL — using in-memory adapter");
     return memoryAdapter(memoryDb);
   }
 
@@ -58,34 +69,35 @@ function buildDatabaseSync() {
     connectTimeoutMS: 12000,
   });
 
-  // Probe the connection once at startup. If Atlas rejects the TLS
-  // handshake (wrong IP allow-list, paused cluster, bad credentials)
-  // the whole auth flow would otherwise blow up on the first request.
-  // On any failure we fall back to the in-memory adapter so the app
-  // keeps working — the user can fix the URL later.
-  client
-    .connect()
-    .then(async () => {
-      await client.db("bazar-dor").command({ ping: 1 });
-      console.log("[auth] MongoDB connected — using persistent database");
-    })
-    .catch((error) => {
-      console.error(
-        "[auth] MongoDB unavailable, falling back to memory adapter:",
-        error?.message ?? error
-      );
+  try {
+    await client.connect();
+    await client.db("bazar-dor").command({ ping: 1 });
+    console.log("[auth] MongoDB connected — using persistent database");
+    return mongodbAdapter(client.db("bazar-dor"), {
+      usePlural: true,
+      transaction: false,
     });
+  } catch (error) {
+    console.error(
+      "[auth] MongoDB unavailable, falling back to memory adapter:",
+      error?.message ?? error
+    );
+    // Close the half-open client so it can't linger.
+    await client.close().catch(() => {});
+    return memoryAdapter(memoryDb);
+  }
+}
 
-  return mongodbAdapter(client.db("bazar-dor"), {
-    usePlural: true,
-    transaction: false,
-  });
+const databasePromise = buildDatabase();
+
+export async function getDatabase() {
+  return databasePromise;
 }
 
 export const auth = betterAuth({
   baseURL,
   secret: process.env.BETTER_AUTH_SECRET || "bazar-dor-demo-secret-please-change",
-  database: buildDatabaseSync(),
+  database: await databasePromise,
   emailAndPassword: {
     enabled: true,
   },
