@@ -52,6 +52,24 @@ export const auth = betterAuth({
     enabled: true,
   },
   socialProviders,
+  // Trust the origin the request actually arrived on, so register and
+  // sign-in work on any host or port (Vercel, preview URLs, custom
+  // local ports). Browsers cannot forge the Host header, so this stays
+  // safe against cross-site request forgery.
+  trustedOrigins: (request) => {
+    if (!request) return [];
+    const host =
+      request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+    if (!host) return [];
+    const forwardedProto = request.headers.get("x-forwarded-proto");
+    const proto =
+      forwardedProto === "http" || forwardedProto === "https"
+        ? forwardedProto
+        : host.includes("localhost") || host.includes("127.0.0.1")
+          ? "http"
+          : "https";
+    return [`${proto}://${host}`];
+  },
   advanced: {
     trustedProxyHeaders: true,
   },
