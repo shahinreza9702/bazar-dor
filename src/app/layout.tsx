@@ -30,7 +30,7 @@ export default function RootLayout({
       lang="bn"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-[#f0f6f1]">
+      <body className="flex min-h-full flex-col bg-[#f0f6f1]" suppressHydrationWarning>
         <Suspense
           fallback={
             <header className="border-b border-gray-200 p-4">

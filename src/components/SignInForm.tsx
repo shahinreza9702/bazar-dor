@@ -35,16 +35,22 @@ export default function SignInForm({
     const email = String(formData.get("email") || "").trim();
     const password = String(formData.get("password") || "");
 
+    console.log("[SignIn] Attempting email sign-in for:", email);
+
     try {
       const response = await authClient.signIn.email({
         email,
         password,
       });
 
+      console.log("[SignIn] Response:", response);
+
       if (response.error) {
         const message = (
           response.error.message ?? ""
         ).toLowerCase();
+
+        console.error("[SignIn] Error:", response.error);
 
         if (message.includes("invalid email")) {
           toast.error("ইমেইল বা পাসওয়ার্ড ভুল");
@@ -62,7 +68,8 @@ export default function SignInForm({
         : "/";
       router.push(safeCallbackUrl);
       router.refresh();
-    } catch {
+    } catch (err) {
+      console.error("[SignIn] Exception:", err);
       toast.error("সাইন ইন করতে সমস্যা হয়েছে");
     } finally {
       setLoading(false);
@@ -72,9 +79,13 @@ export default function SignInForm({
   const handleSocial = async (provider: "google" | "github") => {
     setSocialLoading(provider);
 
+    console.log("[SignIn] Starting social login with:", provider);
+
     try {
-      await authClient.signIn.social({ provider });
-    } catch {
+      const result = await authClient.signIn.social({ provider });
+      console.log("[SignIn] Social login result:", result);
+    } catch (err) {
+      console.error("[SignIn] Social login error:", err);
       toast.error(
         `${provider === "google" ? "Google" : "GitHub"} দিয়ে সাইন ইন এখন উপলব্ধ না`
       );

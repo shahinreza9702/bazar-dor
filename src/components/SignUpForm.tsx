@@ -24,6 +24,8 @@ export default function SignUpForm() {
     const email = String(formData.get("email") || "").trim();
     const password = String(formData.get("password") || "");
 
+    console.log("[SignUp] Attempting registration for:", email, name);
+
     try {
       const response = await authClient.signUp.email({
         name,
@@ -31,12 +33,18 @@ export default function SignUpForm() {
         password,
       });
 
-      if (response.error) {
-        const message = (
-          response.error.message ?? ""
-        ).toLowerCase();
+      console.log("[SignUp] Response:", response);
 
-        if (message.includes("already exists")) {
+      if (response.error) {
+        const raw = (response.error as any);
+        const message = String(raw?.message ?? "").toLowerCase();
+        const status = raw?.status;
+
+        console.error("[SignUp] Error:", raw);
+
+        if (status >= 500 || !message) {
+          toast.error("সার্ভারে সমস্যা হয়েছে — পরে আবার চেষ্টা করুন");
+        } else if (message.includes("already exists")) {
           toast.error("এই ইমেইলে ইতিমধ্যে অ্যাকাউন্ট আছে");
         } else if (message.includes("password")) {
           toast.error("পাসওয়ার্ড কমপক্ষে ৮ অক্ষর হতে হবে");
@@ -49,7 +57,8 @@ export default function SignUpForm() {
       toast.success("অ্যাকাউন্ট তৈরি হয়েছে — এখন সাইন ইন করুন");
       router.push("/signin");
       router.refresh();
-    } catch {
+    } catch (err) {
+      console.error("[SignUp] Exception:", err);
       toast.error("রেজিস্টার করতে সমস্যা হয়েছে");
     } finally {
       setLoading(false);
@@ -59,9 +68,13 @@ export default function SignUpForm() {
   const handleSocial = async (provider: "google" | "github") => {
     setSocialLoading(provider);
 
+    console.log("[SignUp] Starting social login with:", provider);
+
     try {
-      await authClient.signIn.social({ provider });
-    } catch {
+      const result = await authClient.signIn.social({ provider });
+      console.log("[SignUp] Social login result:", result);
+    } catch (err) {
+      console.error("[SignUp] Social login error:", err);
       toast.error(
         `${provider === "google" ? "Google" : "GitHub"} দিয়ে সাইন ইন এখন উপলব্ধ না`
       );
