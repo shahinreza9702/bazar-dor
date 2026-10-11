@@ -4,7 +4,7 @@ import BanglaDate from "@/components/BanglaDate";
 export default function HeroSection() {
   return (
     <section className="relative flex min-h-[200px] flex-col overflow-hidden rounded-2xl border border-[#e1e9e2] bg-gradient-to-br from-[#fbfdfb] to-[#eef6ef] p-5 sm:min-h-[240px] sm:flex-row sm:items-center sm:justify-between sm:p-8">
-      <div className="relative z-10 max-w-xl">
+      <div className="relative z-30 max-w-xl">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e5f4e9] px-3 py-1 text-[11px] font-medium text-green-800 sm:text-xs">
           <span>📅</span>
           <Suspense fallback={<>…</>}>
@@ -39,7 +39,7 @@ export default function HeroSection() {
         >
           <div className="absolute bottom-1 h-4 w-36 rounded-[50%] bg-gray-200/70"></div>
           <div
-            className="absolute bottom-5 z-10 h-12 w-32 rounded-b-xl border-x-4 border-b-4 border-[#87400d] bg-[#b75b17]"
+            className="absolute bottom-5 z-25 h-12 w-32 rounded-b-xl border-x-4 border-b-4 border-[#87400d] bg-[#b75b17]"
             style={{
               clipPath: "polygon(0 0, 100% 0, 88% 100%, 12% 100%)",
             }}
