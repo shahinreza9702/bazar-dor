@@ -35,9 +35,10 @@ async function ProductContent({
 }) {
   const { slug } = await params;
 
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const headersList = await headers();
+  const session = headersList
+    ? await auth.api.getSession({ headers: headersList })
+    : null;
 
   if (!session) {
     redirect(

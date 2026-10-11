@@ -19,9 +19,10 @@ export default function UpdateInfoPage() {
 }
 
 async function UpdateInfoContent() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const headersList = await headers();
+  const session = headersList
+    ? await auth.api.getSession({ headers: headersList })
+    : null;
 
   if (!session) {
     redirect("/signin");

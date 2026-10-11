@@ -20,9 +20,10 @@ export default function ProfilePage() {
 }
 
 async function ProfileContent() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const headersList = await headers();
+  const session = headersList
+    ? await auth.api.getSession({ headers: headersList })
+    : null;
 
   if (!session) {
     redirect("/signin");
