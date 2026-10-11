@@ -3,16 +3,55 @@ import { auth } from "@/auth";
 import { getCategories, getProducts } from "@/lib/api";
 import HeaderClient from "@/components/HeaderClient";
 
-async function getSession() {
-  return auth.api.getSession({ headers: await headers() });
-}
-
 export default async function HeaderSection() {
-  const [categories, products, session] = await Promise.all([
-    getCategories(),
-    getProducts(),
-    getSession(),
-  ]);
+  const [categoriesResult, productsResult, sessionResult] =
+    await Promise.allSettled([
+      getCategories(),
+      getProducts(),
+      auth.api.getSession({ headers: await headers() }),
+    ]);
 
-  return <HeaderClient categories={categories} products={products} session={session} />;
+  if (categoriesResult.status === "rejected") {
+    console.error(
+      "[HeaderSection] Categories failed:",
+      categoriesResult.reason
+    );
+  }
+
+  if (productsResult.status === "rejected") {
+    console.error(
+      "[HeaderSection] Products failed:",
+      productsResult.reason
+    );
+  }
+
+  if (sessionResult.status === "rejected") {
+    console.error(
+      "[HeaderSection] Session failed:",
+      sessionResult.reason
+    );
+  }
+
+  const categories =
+    categoriesResult.status === "fulfilled"
+      ? categoriesResult.value
+      : [];
+
+  const products =
+    productsResult.status === "fulfilled"
+      ? productsResult.value
+      : [];
+
+  const session =
+    sessionResult.status === "fulfilled"
+      ? sessionResult.value
+      : null;
+
+  return (
+    <HeaderClient
+      categories={categories}
+      products={products}
+      session={session}
+    />
+  );
 }
